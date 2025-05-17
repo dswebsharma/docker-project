@@ -6,6 +6,7 @@ services:
     container_name: wordpress
     volumes:
       - ./wordpress:/var/www/html
+      - ./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
     environment:
       WORDPRESS_DB_HOST: db
       WORDPRESS_DB_USER: dsweb_usernamhai
