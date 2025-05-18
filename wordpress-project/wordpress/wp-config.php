@@ -60,6 +60,9 @@ define( 'LOGGED_IN_SALT',   'put your unique phrase here' );
 define( 'NONCE_SALT',       'put your unique phrase here' );
 
 /**#@-*/
+define('WP_REDIS_HOST', 'redis');  // Redis container name as host
+define('WP_REDIS_PORT', 6379);  
+define('WP_REDIS_DATABASE', 1); 
 
 /**
  * WordPress database table prefix.

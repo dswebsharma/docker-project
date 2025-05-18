@@ -3,7 +3,10 @@ version: '3.8'
 services:
   wordpress:
     image: wordpress:php8.2-fpm
-    container_name: wordpress
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
     volumes:
       - ./wordpress:/var/www/html
       - ./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
@@ -15,11 +18,10 @@ services:
     networks:
       - wordpress_net
 
-  nginx:
+  loadbalancer:
     image: nginx:latest
-    container_name: nginx
     volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/default.conf:/etc/nginx/nginx.conf
       - ./wordpress:/var/www/html
       - ./certbot/www:/var/www/certbot
       - ./certbot/conf:/etc/letsencrypt
@@ -33,7 +35,6 @@ services:
 
   db:
     image: mysql:8.0
-    container_name: mysql80
     environment:
       MYSQL_ROOT_PASSWORD: 3UMPdf@83B7534oIDT
       MYSQL_DATABASE: dsweb_dbnameis
@@ -41,12 +42,12 @@ services:
       MYSQL_PASSWORD: 83B7534oIDTNQX
     volumes:
       - ./db:/var/lib/mysql
+      - ./my-custom.cnf:/etc/mysql/conf.d/my-custom.cnf
     networks:
       - wordpress_net
 
   certbot:
     image: certbot/certbot
-    container_name: certbot
     volumes:
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
@@ -54,8 +55,18 @@ services:
     networks:
       - wordpress_net
 
+  redis:  # Adding Redis service
+    image: redis:latest
+    networks:
+      - wordpress_net
+    ports:
+      - "6379:6379"  # Exposing Redis on port 6379 (optional for debugging)
+    volumes:
+      - redis_data:/data
+
 volumes:
   db_data:
+  redis_data:
 
 networks:
   wordpress_net:
